@@ -285,15 +285,19 @@ class SudokuWidget(QtWidgets.QWidget):
         pen.setWidth(4)
         painter.setPen(pen)
 
-        # Вертикальные линии: 0, 3, 6, 9
-        for i in (3, 6, 9):
-            x = x0 + i * CELL_SIZE
-            painter.drawLine(x, y0, x, y0 + height)
+        # Вертикальные тонкие линии (кроме границ блоков)
+        for i in range(1, 9):
+            if i % 3 != 0:
+                x = x0 + i * CELL_SIZE
+                painter.drawLine(x, y0, x, y0 + height)
 
-        # Горизонтальные линии: 0, 3, 6, 9
-        for i in (0, 3, 6, 9):
-            y = y0 + i * CELL_SIZE
-            painter.drawLine(x0, y, x0 + width, y)
+        # Горизонтальные тонкие линии (кроме границ блоков)
+        for i in range(1, 9):
+            if i % 3 != 0:
+                y = y0 + i * CELL_SIZE
+                painter.drawLine(x0, y, x0 + width, y)
+
+
 
 
 
