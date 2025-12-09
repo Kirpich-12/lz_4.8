@@ -2,11 +2,11 @@ import sys
 from PyQt5.QtCore import Qt
 from PyQt5 import QtWidgets, QtGui, QtCore
 
-
 from sudoky import (make_puzzle,
                     is_conflict,
                     is_win
                     )
+
 
 
 GRID_SIZE = 9
@@ -103,7 +103,7 @@ class SudokuWidget(QtWidgets.QWidget):
         layout.addLayout(side)
 
         # Состояние выбранной клетки
-        self.selected = None  # (r, c)
+        self.selected = None
 
         self.update_visuals()
 
@@ -242,12 +242,18 @@ class SudokuWidget(QtWidgets.QWidget):
         self.current[r][c] = 0
         self.update_visuals()
 
-    def _restore_bg(self, r, c, bgbrush):
+    def _restore_bg(self,
+                    r:int,
+                    c:int,
+                    bgbrush:QtGui.QBrush
+                    ):
         item = self.table.item(r, c)
         item.setBackground(bgbrush)
         self.light_mode()
 
-    def flash_conflict_cell(self, r, c):
+    def flash_conflict_cell(self,
+                             r:int,
+                             c:int):
         item = self.table.item(r, c)
         orig_bg = item.background()
         item.setBackground(QtGui.QBrush(QtGui.QColor('#ff9999')))
