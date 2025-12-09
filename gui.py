@@ -8,7 +8,6 @@ from sudoky import (make_puzzle,
                     is_win
                     )
 
-from overlay import Overlay
 
 GRID_SIZE = 9
 REMOVE_COUNT = 20  # сколько цифр убрать
@@ -18,7 +17,6 @@ CELL_SIZE = 50
 class SudokuWidget(QtWidgets.QWidget):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Sudoku — PyQt5")
         self.puzzle, self.solved = make_puzzle(remove_count=REMOVE_COUNT)
         self.current = [row[:] for row in self.puzzle]
         self.init_ui()
@@ -43,7 +41,7 @@ class SudokuWidget(QtWidgets.QWidget):
             self.table.setColumnWidth(i, CELL_SIZE)
             self.table.setRowHeight(i, CELL_SIZE)
 
-        # Заполним значениями
+        # Заполнения ячеек
         for r in range(9):
             for c in range(9):
                 item = QtWidgets.QTableWidgetItem()
@@ -134,7 +132,7 @@ class SudokuWidget(QtWidgets.QWidget):
                     item.setBackground(QtGui.QBrush(QtGui.QColor('#e0e0e0')))
                 else:
                     item.setFlags(QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable)
-        self.highlight_selection()
+        self.light_mode()
 
     def show_win_screen(self):
         dialog = QtWidgets.QDialog(self)
@@ -184,12 +182,12 @@ class SudokuWidget(QtWidgets.QWidget):
     def cell_clicked(self, r, c):
         # Выбор клетки мышью
         self.selected = (r, c)
-        self.highlight_selection()
+        self.light_mode()
         self.check_win()
         
 
-    def highlight_selection(self):
-        # Сбросить стилевые подсветки
+    def light_mode(self):
+        # подсветка
         for r in range(9):
             for c in range(9):
                 item = self.table.item(r, c)
@@ -243,18 +241,17 @@ class SudokuWidget(QtWidgets.QWidget):
             return
         self.current[r][c] = 0
         self.update_visuals()
-        self.check_win()
+
+    def _restore_bg(self, r, c, bgbrush):
+        item = self.table.item(r, c)
+        item.setBackground(bgbrush)
+        self.light_mode()
 
     def flash_conflict_cell(self, r, c):
         item = self.table.item(r, c)
         orig_bg = item.background()
         item.setBackground(QtGui.QBrush(QtGui.QColor('#ff9999')))
         QtCore.QTimer.singleShot(400, lambda: self._restore_bg(r, c, orig_bg))
-
-    def _restore_bg(self, r, c, bgbrush):
-        item = self.table.item(r, c)
-        item.setBackground(bgbrush)
-        self.highlight_selection()
 
     def new_game(self, remvd = 20):
         self.puzzle, self.solved = make_puzzle(remove_count=remvd)
@@ -279,11 +276,6 @@ class SudokuWidget(QtWidgets.QWidget):
                     self.current[r][c] = self.solved[r][c]
         self.update_visuals()
     
-
-
-
-
-
 
 def main():
     app = QtWidgets.QApplication(sys.argv)

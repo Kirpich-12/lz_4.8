@@ -3,39 +3,46 @@ import random
 
 def base_solved_grid() -> list[list[int]]:
     """сетка 9 * 9."""
-    grid = [[(r * 3 + r // 3 + c) % 9 + 1 for c in range(9)] for r in range(9)]
+
+    grid = []
+
+    for r in range(9):
+        row = []
+        for c in range(9):
+            value = (r * 3 + r // 3 + c) % 9 + 1
+            row.append(value)
+        grid.append(row)
     return grid
+
+def shuffle_stacks_cols(g):
+    # переставляем блоки столбцов
+    cols = [0, 1, 2]
+    random.shuffle(cols)
+    mat = [[None] * 9 for _ in range(9)]
+    for new_b, b in enumerate(cols):
+        chosen = list(range(b * 3, b * 3 + 3))
+        random.shuffle(chosen)
+        for r in range(9):
+            for i, c in enumerate(chosen):
+                mat[r][new_b * 3 + i] = g[r][c]
+    return mat
+
+def shuffle_bands_rows(g):
+    # переставляем блоки строк (0-2,3-5,6-8)
+    bands = [0, 1, 2]
+    random.shuffle(bands)
+    new = []
+    for b in bands:
+        rows = list(range(b * 3, b * 3 + 3))
+        random.shuffle(rows)
+        for r in rows:
+            new.append(g[r])
+    return new
 
 
 def shuffle_grid(grid:list[list[int]]) -> list[list[int]]:
     """Перемешиваем цифры"""
     g = [row[:] for row in grid]
-
-    def shuffle_bands_rows(g):
-        # переставляем блоки строк (0-2,3-5,6-8)
-        bands = [0, 1, 2]
-        random.shuffle(bands)
-        new = []
-        for b in bands:
-            rows = list(range(b * 3, b * 3 + 3))
-            random.shuffle(rows)
-            for r in rows:
-                new.append(g[r])
-        return new
-
-    def shuffle_stacks_cols(g):
-        # переставляем блоки столбцов
-        cols = [0, 1, 2]
-        random.shuffle(cols)
-        mat = [[None] * 9 for _ in range(9)]
-        for new_b, b in enumerate(cols):
-            chosen = list(range(b * 3, b * 3 + 3))
-            random.shuffle(chosen)
-            for r in range(9):
-                for i, c in enumerate(chosen):
-                    mat[r][new_b * 3 + i] = g[r][c]
-        return mat
-
     g = shuffle_bands_rows(g)
     g = shuffle_stacks_cols(g)
 
