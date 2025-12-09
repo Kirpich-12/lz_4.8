@@ -1,6 +1,5 @@
 import random
 
-
 def base_solved_grid() -> list[list[int]]:
     """сетка 9 * 9."""
 
