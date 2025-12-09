@@ -1,10 +1,14 @@
 import sys
+from PyQt5.QtCore import Qt
 from PyQt5 import QtWidgets, QtGui, QtCore
+
 
 from sudoky import (make_puzzle,
                     is_conflict,
                     is_win
                     )
+
+from overlay import Overlay
 
 GRID_SIZE = 9
 REMOVE_COUNT = 20  # сколько цифр убрать
@@ -24,6 +28,9 @@ class SudokuWidget(QtWidgets.QWidget):
 
         self.table = QtWidgets.QTableWidget(9, 9)
         self.table.setFixedSize(CELL_SIZE * GRID_SIZE + 2, CELL_SIZE * GRID_SIZE + 2)
+        flags = self.windowFlags()
+        flags &= ~Qt.WindowMaximizeButtonHint
+        self.setWindowFlags(flags)
         self.table.horizontalHeader().setVisible(False)
         self.table.verticalHeader().setVisible(False)
         self.table.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
@@ -78,9 +85,17 @@ class SudokuWidget(QtWidgets.QWidget):
         side.addWidget(erase_btn)
 
         side.addSpacing(10)
-        new_btn = QtWidgets.QPushButton("Новая игра")
-        new_btn.clicked.connect(self.new_game)
+        new_btn = QtWidgets.QPushButton("Легкий")
+        new_btn.clicked.connect(lambda: self.new_game(7))
         side.addWidget(new_btn)
+
+        new_btn1 = QtWidgets.QPushButton("Средний")
+        new_btn1.clicked.connect(lambda: self.new_game(23))
+        side.addWidget(new_btn1)
+
+        new_btn2 = QtWidgets.QPushButton("Сложный")
+        new_btn2.clicked.connect(lambda: self.new_game(33))
+        side.addWidget(new_btn2)
 
         show_btn = QtWidgets.QPushButton("Показать решение")
         show_btn.clicked.connect(self.show_solution)
@@ -189,21 +204,21 @@ class SudokuWidget(QtWidgets.QWidget):
         sr, sc = self.selected
         # подсветка выбранной клетки
         sel_item = self.table.item(sr, sc)
-        sel_item.setBackground(QtGui.QBrush(QtGui.QColor('#cce8ff')))
+        sel_item.setBackground(QtGui.QBrush(QtGui.QColor("#f0f8ff")))
         # подсветка
         for i in range(9):
             if i != sc:
                 it = self.table.item(sr, i)
-                it.setBackground(QtGui.QBrush(QtGui.QColor('#f0f8ff')))
+                it.setBackground(QtGui.QBrush(QtGui.QColor("#335266")))
             if i != sr:
                 it = self.table.item(i, sc)
-                it.setBackground(QtGui.QBrush(QtGui.QColor('#f0f8ff')))
+                it.setBackground(QtGui.QBrush(QtGui.QColor('#335266')))
         br, bc = (sr // 3) * 3, (sc // 3) * 3
         for r in range(br, br + 3):
             for c in range(bc, bc + 3):
                 if (r, c) != (sr, sc):
                     it = self.table.item(r, c)
-                    it.setBackground(QtGui.QBrush(QtGui.QColor('#f5fbff')))
+                    it.setBackground(QtGui.QBrush(QtGui.QColor("#1e7ed3")))
 
     def make_number_handler(self, num):
         def handler():
@@ -241,8 +256,8 @@ class SudokuWidget(QtWidgets.QWidget):
         item.setBackground(bgbrush)
         self.highlight_selection()
 
-    def new_game(self):
-        self.puzzle, self.solved = make_puzzle(remove_count=REMOVE_COUNT)
+    def new_game(self, remvd = 20):
+        self.puzzle, self.solved = make_puzzle(remove_count=remvd)
         self.current = [row[:] for row in self.puzzle]
         self.selected = None
         # обновляем таблицу текста и стили
@@ -264,38 +279,6 @@ class SudokuWidget(QtWidgets.QWidget):
                     self.current[r][c] = self.solved[r][c]
         self.update_visuals()
     
-
-    #FIXME
-    def paintEvent(self, event):
-        super().paintEvent(event)
-
-        painter = QtGui.QPainter(self)
-        painter.setRenderHint(QtGui.QPainter.Antialiasing)
-
-        # Координаты таблицы
-        table_pos = self.table.pos()
-        x0 = table_pos.x()
-        y0 = table_pos.y()
-
-        width = CELL_SIZE * 9
-        height = CELL_SIZE * 9
-
-        # --- Толстые тёмные линии для блоков 3×3 ---
-        pen = QtGui.QPen(QtGui.QColor("#000000"))
-        pen.setWidth(4)
-        painter.setPen(pen)
-
-        # Вертикальные тонкие линии (кроме границ блоков)
-        for i in range(1, 9):
-            if i % 3 != 0:
-                x = x0 + i * CELL_SIZE
-                painter.drawLine(x, y0, x, y0 + height)
-
-        # Горизонтальные тонкие линии (кроме границ блоков)
-        for i in range(1, 9):
-            if i % 3 != 0:
-                y = y0 + i * CELL_SIZE
-                painter.drawLine(x0, y, x0 + width, y)
 
 
 

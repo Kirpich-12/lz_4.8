@@ -1,3 +1,7 @@
+from PyQt5 import QtWidgets, QtGui, QtCore
+
+CELL_SIZE = 50
+
 class Overlay(QtWidgets.QWidget):
     def __init__(self, parent):
         super().__init__(parent)
@@ -14,9 +18,9 @@ class Overlay(QtWidgets.QWidget):
 
         # Вертикальные линии
         for i in (0, 3, 6, 9):
-            x = i * cell_size
+            x =  i * cell_size - 10
             painter.drawLine(x, 0, x, 9 * cell_size)
         # Горизонтальные линии
         for i in (0, 3, 6, 9):
-            y = i * cell_size
+            y = 10 + i * cell_size
             painter.drawLine(0, y, 9 * cell_size, y)
